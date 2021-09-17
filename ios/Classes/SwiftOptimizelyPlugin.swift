@@ -94,6 +94,27 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
             } catch {
               result(error.localizedDescription)
             }
+        case "getVariation":
+            do {
+                let client = try ensureClient()
+                let items = try getFeatureItems(from: arguments)
+                let res: String = try client.getVariationKey(
+                    experimentKey: items.featureKey,
+                    userId: items.userId,
+                    attributes: items.attributes
+                )
+                result(res)
+            } catch {
+              result(error.localizedDescription)
+            }
+        case "trackEvent":
+            do {
+                let client = try ensureClient()
+                let items = try getFeatureItems(from: arguments)
+                try  client.track(eventKey: items.featureKey, userId: items.userId);
+            } catch {
+              result(error.localizedDescription)
+            }
         default:
             result(FlutterMethodNotImplemented)
         }

@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.annotation.NonNull
 import com.optimizely.ab.android.sdk.OptimizelyClient
 import com.optimizely.ab.android.sdk.OptimizelyManager
+import com.optimizely.ab.config.Variation
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -27,7 +28,7 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "optimizely_plugin")
-    channel.setMethodCallHandler(this);
+    channel.setMethodCallHandler(this)
   }
 
   // This static function is optional and equivalent to onAttachedToEngine. It supports the old
@@ -73,6 +74,20 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         val variables = getAllFeatureVariables(featureKey!!, userId!!, attributes!!)
         result.success(variables)
       }
+      "getvariation" -> {
+        val featureKey = call.argument<String>("feature_key")
+        val userId = call.argument<String>("user_id")
+        val attributes = call.argument<MutableMap<String, Any>>("attributes")
+        val variation = getVariation(featureKey!!, userId!!, attributes!!)
+        result.success(variation)
+      }
+      "trackEvent" -> {
+        val featureKey = call.argument<String>("feature_key")
+        val userId = call.argument<String>("user_id")
+        val attributes = call.argument<MutableMap<String, Any>>("attributes")
+        trackEvent(featureKey!!, userId!!, attributes!!)
+        result.success("")
+      }
       else -> result.notImplemented()
     }
   }
@@ -90,7 +105,7 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity;
+    activity = binding.activity
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
@@ -134,5 +149,13 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private fun getAllFeatureVariables(featureKey: String, userId: String, attributes: MutableMap<String, Any>): Map<String, Any>? {
     val json = optimizelyClient.getAllFeatureVariables(featureKey, userId, attributes)
     return json?.toMap()
+  }
+
+  private fun getVariation(featureKey: String, userId: String, attributes: MutableMap<String, Any>): Variation? {
+    return optimizelyClient.getVariation(featureKey, userId, attributes)
+  }
+
+  private fun trackEvent(eventKey: String, userId: String, attributes: MutableMap<String, Any>) {
+    optimizelyClient.track(eventKey, userId)
   }
 }
