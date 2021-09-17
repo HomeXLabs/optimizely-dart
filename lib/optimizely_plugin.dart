@@ -71,11 +71,13 @@ class OptimizelyPlugin {
       String featureKey,
       userID,
       Map<String, dynamic> attributes,
+      Map<String, dynamic> eventTags,
       ) async {
     await _channel.invokeMethod('trackEvent', <String, dynamic>{
       'feature_key': featureKey,
       'user_id': userID,
       'attributes': attributes,
+      'event_tags': eventTags,
     });
   }
 }

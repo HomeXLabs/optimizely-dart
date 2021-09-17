@@ -85,7 +85,8 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         val featureKey = call.argument<String>("feature_key")
         val userId = call.argument<String>("user_id")
         val attributes = call.argument<MutableMap<String, Any>>("attributes")
-        trackEvent(featureKey!!, userId!!, attributes!!)
+        val eventTags = call.argument<MutableMap<String, Any>>("event_tags")
+        trackEvent(featureKey!!, userId!!, attributes!!, eventTags!!)
         result.success("")
       }
       else -> result.notImplemented()
@@ -155,7 +156,7 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     return optimizelyClient.getVariation(featureKey, userId, attributes)
   }
 
-  private fun trackEvent(eventKey: String, userId: String, attributes: MutableMap<String, Any>) {
-    optimizelyClient.track(eventKey, userId)
+  private fun trackEvent(eventKey: String, userId: String, attributes: MutableMap<String, Any>, eventTags: MutableMap<String, Any>) {
+    optimizelyClient.track(eventKey, userId, attributes, eventTags)
   }
 }

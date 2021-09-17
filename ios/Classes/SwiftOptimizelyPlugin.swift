@@ -8,7 +8,7 @@ enum InitResult {
 
 public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
     
-    typealias GetFeatureItems = (featureKey: String, userId: String, attributes: OptimizelyAttributes?)
+    typealias GetFeatureItems = (featureKey: String, userId: String, attributes: OptimizelyAttributes?, eventTags: OptimizelyEventTags?)
     var client: OptimizelyClient?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -111,7 +111,12 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
             do {
                 let client = try ensureClient()
                 let items = try getFeatureItems(from: arguments)
-                try  client.track(eventKey: items.featureKey, userId: items.userId);
+                try  client.track(
+                    eventKey: items.featureKey,
+                    userId: items.userId,
+                    attributes: items.attributes,
+                    eventTags: items.eventTags
+                )
             } catch {
               result(error.localizedDescription)
             }
@@ -154,7 +159,8 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
         let featureKey: String = try arguments.argument(for: "feature_key")
         let userId: String = try arguments.argument(for: "user_id")
         let attributes: OptimizelyAttributes? = try arguments.optionalArgument(for: "attributes")
-        return (featureKey, userId, attributes)
+        let eventTags: OptimizelyEventTags? = try arguments.optionalArgument(for: "event_tags")
+        return (featureKey, userId, attributes, eventTags)
     }
 }
 
