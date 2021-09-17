@@ -31,11 +31,12 @@ class OptimizelyPlugin {
     userID,
     Map<String, dynamic> attributes,
   ) async {
-    return await _channel.invokeMethod('isFeatureEnabled', <String, dynamic>{
+    var res = await _channel.invokeMethod('isFeatureEnabled', <String, dynamic>{
       'feature_key': featureKey,
       'user_id': userID,
       'attributes': attributes
     });
+    return res;
   }
 
   Future<Map<String, dynamic>> getAllFeatureVariables(
@@ -50,5 +51,31 @@ class OptimizelyPlugin {
       'attributes': attributes,
     });
     return Map<String, dynamic>.from(featureVariables);
+  }
+
+  Future<String?> getVariation(
+      String featureKey,
+      userID,
+      Map<String, dynamic> attributes,
+      ) async {
+    final variation =
+    await _channel.invokeMethod('getVariation', <String, dynamic>{
+      'feature_key': featureKey,
+      'user_id': userID,
+      'attributes': attributes,
+    });
+    return variation;
+  }
+
+  Future trackEvent(
+      String featureKey,
+      userID,
+      Map<String, dynamic> attributes,
+      ) async {
+    await _channel.invokeMethod('trackEvent', <String, dynamic>{
+      'feature_key': featureKey,
+      'user_id': userID,
+      'attributes': attributes,
+    });
   }
 }
