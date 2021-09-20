@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:optimizely_plugin/optimizely_plugin.dart';
+import 'package:optimizely_dart/optimizely_dart.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('optimizely_plugin');

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:optimizely_plugin/optimizely_plugin.dart';
+import 'package:optimizely_dart/optimizely_dart.dart';
 
 Future<void> main() async {
   runApp(MyApp());
