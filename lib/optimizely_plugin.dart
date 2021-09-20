@@ -26,6 +26,7 @@ class OptimizelyPlugin {
     });
   }
 
+  //https://docs.developers.optimizely.com/full-stack/docs/run-feature-tests
   Future<bool?> isFeatureEnabled(
     String featureKey,
     userID,
@@ -39,6 +40,7 @@ class OptimizelyPlugin {
     return res;
   }
 
+  //https://docs.developers.optimizely.com/full-stack/docs/test-with-feature-configuration
   Future<Map<String, dynamic>> getAllFeatureVariables(
     String featureKey,
     userID,
@@ -53,13 +55,14 @@ class OptimizelyPlugin {
     return Map<String, dynamic>.from(featureVariables);
   }
 
+  //https://docs.developers.optimizely.com/full-stack/docs/run-a-b-tests
   Future<String?> getVariation(
-      String featureKey,
-      userID,
-      Map<String, dynamic> attributes,
-      ) async {
+    String featureKey,
+    userID,
+    Map<String, dynamic> attributes,
+  ) async {
     final variation =
-    await _channel.invokeMethod('getVariation', <String, dynamic>{
+        await _channel.invokeMethod('getVariation', <String, dynamic>{
       'feature_key': featureKey,
       'user_id': userID,
       'attributes': attributes,
@@ -67,12 +70,15 @@ class OptimizelyPlugin {
     return variation;
   }
 
+  //https://docs.developers.optimizely.com/full-stack/docs/track-events
+  //https://docs.developers.optimizely.com/full-stack/docs/include-event-tags
+  // eventTags.addAll({"revenue", 4200}); Reserved "revenue" tag
   Future trackEvent(
-      String featureKey,
-      userID,
-      Map<String, dynamic> attributes,
-      Map<String, dynamic> eventTags,
-      ) async {
+    String featureKey,
+    userID,
+    Map<String, dynamic> attributes,
+    Map<String, dynamic> eventTags,
+  ) async {
     await _channel.invokeMethod('trackEvent', <String, dynamic>{
       'feature_key': featureKey,
       'user_id': userID,

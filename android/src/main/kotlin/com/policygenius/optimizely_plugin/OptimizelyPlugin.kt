@@ -23,7 +23,7 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
   private lateinit var activity: Activity
-  //private lateinit var optimizelyManager: OptimizelyManager
+
   private lateinit var optimizelyClient: OptimizelyClient
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -142,9 +142,7 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun isFeatureEnabled(featureKey: String, userId: String): Boolean{
-    val flag = optimizelyClient.isFeatureEnabled(featureKey, userId)
-
-    return flag
+    return optimizelyClient.isFeatureEnabled(featureKey, userId)
   }
 
   private fun getAllFeatureVariables(featureKey: String, userId: String, attributes: MutableMap<String, Any>): Map<String, Any>? {
