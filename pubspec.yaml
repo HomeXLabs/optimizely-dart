@@ -20,7 +20,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.policygenius.optimizely_plugin
+        package: com.homexlabs.optimizely_dart
         pluginClass: OptimizelyPlugin
       ios:
         pluginClass: OptimizelyPlugin

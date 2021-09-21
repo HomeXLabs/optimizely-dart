@@ -1,6 +1,6 @@
-# optimizely_plugin_example
+# optimizely_dart_example
 
-Demonstrates how to use the optimizely_plugin plugin.
+Demonstrates how to use the optimizely_dart plugin.
 
 ## Getting Started
 

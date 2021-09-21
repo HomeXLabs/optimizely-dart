@@ -1,4 +1,4 @@
-package com.policygenius.optimizely_plugin_example
+package com.homexlabs.optimizely_dart_example
 
 import io.flutter.embedding.android.FlutterActivity
 
