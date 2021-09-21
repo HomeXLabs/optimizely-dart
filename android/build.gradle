@@ -1,4 +1,4 @@
-group 'com.policygenius.optimizely_plugin'
+group 'com.homexlabs.optimizely_dart'
 version '1.0-SNAPSHOT'
 
 buildscript {

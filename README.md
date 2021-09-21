@@ -15,7 +15,7 @@ functions supported:
 [`trackEvent`](https://docs.developers.optimizely.com/full-stack/docs/get-all-feature-variables-android).
  
 ```dart
-import 'package:optimizely_plugin/optimizely_plugin.dart';
+import 'package:optimizely_dart/optimizely_dart.dart';
 ...
 await OptimizelyPlugin.initOptimizelyManager('your_optimizely_sdk_key');
 bool featureEnabled = await OptimizelyPlugin.isFeatureEnabled('your_flag', 'some_user@xyz.com');

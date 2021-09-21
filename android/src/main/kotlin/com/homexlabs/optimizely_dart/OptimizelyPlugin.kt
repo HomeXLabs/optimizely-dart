@@ -1,4 +1,4 @@
-package com.policygenius.optimizely_plugin
+package com.homexlabs.optimizely_dart
 
 import android.app.Activity
 import androidx.annotation.NonNull
