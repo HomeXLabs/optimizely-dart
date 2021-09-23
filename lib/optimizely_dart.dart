@@ -27,13 +27,11 @@ class OptimizelyPlugin {
   }
 
   Future<void> setUser(
-      userID,
-      Map<String, dynamic> attributes,
-      ) async {
-    await _channel.invokeMethod('setUser', <String, dynamic>{
-      'user_id': userID,
-      'attributes': attributes
-    });
+    userID,
+    Map<String, dynamic> attributes,
+  ) async {
+    await _channel.invokeMethod('setUser',
+        <String, dynamic>{'user_id': userID, 'attributes': attributes});
   }
 
   Future<bool?> isFeatureEnabled(
@@ -73,15 +71,15 @@ class OptimizelyPlugin {
 
   Future<Map<String, dynamic>> getAllEnabledFeatures() async {
     final enabledFeatures =
-    await _channel.invokeMethod('getAllEnabledFeatures');
+        await _channel.invokeMethod('getAllEnabledFeatures');
     return Map<String, dynamic>.from(enabledFeatures);
   }
 
   Future<String?> activateGetVariation(
-      String experimentKey,
-      ) async {
+    String experimentKey,
+  ) async {
     final variation =
-    await _channel.invokeMethod('getAllFeatureVariables', <String, dynamic>{
+        await _channel.invokeMethod('getAllFeatureVariables', <String, dynamic>{
       'feature_key': experimentKey,
     });
     return variation;
