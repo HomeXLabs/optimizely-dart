@@ -9,11 +9,13 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Flutter plugin for optimizely SDK
                        DESC
+  s.homepage         = 'https://homex.com'
   s.license          = { :file => '../LICENSE' }
+  s.author           = { 'HomexLabs' => '' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'OptimizelySwiftSDK', '~> 3.6.1'
+  s.dependency 'OptimizelySwiftSDK', '~> 3.9.0'
   s.platform = :ios, '10.0'
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.

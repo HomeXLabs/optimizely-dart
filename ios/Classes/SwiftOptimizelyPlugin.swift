@@ -10,6 +10,7 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
     
     typealias GetFeatureItems = (featureKey: String, userId: String, attributes: OptimizelyAttributes?, eventTags: OptimizelyEventTags?)
     var client: OptimizelyClient?
+    var user: OptimizelyUserContext?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
@@ -40,7 +41,7 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
                     periodicDownloadInterval: 60
                 )
               
-                try startClient(client, dataFile: dataFile)
+                try client.start(datafile: dataFile!)
                 self.client = client
               
                 result(nil)
@@ -55,7 +56,7 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
               periodicDownloadInterval: 60
             )
             
-            try startClient(client) { initResult in
+            client.start { initResult in
               switch initResult {
                 case .failure(let error):
                   result(error.localizedDescription)
@@ -70,26 +71,34 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
           }
         case "isFeatureEnabled":
             do {
-                let client = try ensureClient()
-                let items = try getFeatureItems(from: arguments)
-                let enabled = client.isFeatureEnabled(
-                    featureKey: items.featureKey,
-                    userId: items.userId,
-                    attributes: items.attributes
-                )
+                let user = try ensureUser()
+                let featureKey: String = try arguments.argument(for: "feature_key")
+                let decision = user.decide(key: featureKey)
+                let enabled = decision.enabled
                 result(enabled)
+            } catch {
+              result(error.localizedDescription)
+            }
+        case "setUser":
+            do {
+                let client = try ensureClient()
+                let userId: String = try arguments.argument(for: "user_id")
+                let attributes: OptimizelyAttributes? = try arguments.optionalArgument(for: "attributes")
+                if(attributes != nil && !attributes!.isEmpty){
+                    self.user = client.createUserContext(userId: userId, attributes: attributes! as [String : Any])
+                }
+                else{
+                    self.user = client.createUserContext(userId: userId)
+                }
             } catch {
               result(error.localizedDescription)
             }
         case "getAllFeatureVariables":
             do {
-                let client = try ensureClient()
-                let items = try getFeatureItems(from: arguments)
-                let json: OptimizelyJSON = try client.getAllFeatureVariables(
-                    featureKey: items.featureKey,
-                    userId: items.userId,
-                    attributes: items.attributes
-                )
+                let user = try ensureUser()
+                let featureKey: String = try arguments.argument(for: "feature_key")
+                let decision = user.decide(key: featureKey)
+                let json: OptimizelyJSON = decision.variables
                 result(json.toMap())
             } catch {
               result(error.localizedDescription)
@@ -97,26 +106,43 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
         case "getVariation":
             do {
                 let client = try ensureClient()
-                let items = try getFeatureItems(from: arguments)
+                let userId: String = try arguments.argument(for: "user_id")
+                let attributes: OptimizelyAttributes? = try arguments.optionalArgument(for: "attributes")
+                let featureKey: String = try arguments.argument(for: "feature_key")
                 let res: String = try client.getVariationKey(
-                    experimentKey: items.featureKey,
-                    userId: items.userId,
-                    attributes: items.attributes
+                    experimentKey: featureKey,
+                    userId: userId,
+                    attributes: attributes
                 )
                 result(res)
             } catch {
               result(error.localizedDescription)
             }
+        case "activateGetVariation":
+            do {
+                let user = try ensureUser()
+                let featureKey: String = try arguments.argument(for: "feature_key")
+                let decision = user.decide(key: featureKey)
+                result(decision.variationKey)
+            } catch {
+              result(error.localizedDescription)
+            }
+        case "getAllEnabledFeatures":
+            do {
+                let user = try ensureUser()
+                let decisions = user.decideAll(options: [.enabledFlagsOnly])
+                let enabledFlags = decisions.keys
+                result(enabledFlags)
+            } catch {
+              result(error.localizedDescription)
+            }
         case "trackEvent":
             do {
-                let client = try ensureClient()
-                let items = try getFeatureItems(from: arguments)
-                try  client.track(
-                    eventKey: items.featureKey,
-                    userId: items.userId,
-                    attributes: items.attributes,
-                    eventTags: items.eventTags
-                )
+                let user = try ensureUser()
+                let eventKey: String = try arguments.argument(for: "event_key")
+                let eventTags: OptimizelyEventTags? = try arguments.argument(for: "event_tags")
+                try? user.trackEvent(eventKey: eventKey,
+                                     eventTags: eventTags )
             } catch {
               result(error.localizedDescription)
             }
@@ -134,6 +160,17 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
             )
         }
         return client
+    }
+    
+    func ensureUser() throws -> OptimizelyUserContext {
+        guard let user = self.user else {
+            throw FlutterError(
+                code: "user",
+                message: "Optimizely user not initialized",
+                details: nil
+            )
+        }
+        return user
     }
 
     func startClient(_ client: OptimizelyClient, dataFile: String?) throws {
@@ -153,14 +190,6 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
             completion(.success)
           }
       }
-    }
-      
-    func getFeatureItems(from arguments: [String: Any]) throws -> GetFeatureItems {
-        let featureKey: String = try arguments.argument(for: "feature_key")
-        let userId: String = try arguments.argument(for: "user_id")
-        let attributes: OptimizelyAttributes? = try arguments.optionalArgument(for: "attributes")
-        let eventTags: OptimizelyEventTags? = try arguments.optionalArgument(for: "event_tags")
-        return (featureKey, userId, attributes, eventTags)
     }
 }
 
