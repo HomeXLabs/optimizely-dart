@@ -26,36 +26,37 @@ class OptimizelyPlugin {
     });
   }
 
-  //https://docs.developers.optimizely.com/full-stack/docs/run-feature-tests
+  Future<void> setUser(
+      userID,
+      Map<String, dynamic> attributes,
+      ) async {
+    await _channel.invokeMethod('setUser', <String, dynamic>{
+      'user_id': userID,
+      'attributes': attributes
+    });
+  }
+
   Future<bool?> isFeatureEnabled(
     String featureKey,
-    userID,
-    Map<String, dynamic> attributes,
   ) async {
     var res = await _channel.invokeMethod('isFeatureEnabled', <String, dynamic>{
       'feature_key': featureKey,
-      'user_id': userID,
-      'attributes': attributes
     });
     return res;
   }
 
-  //https://docs.developers.optimizely.com/full-stack/docs/test-with-feature-configuration
   Future<Map<String, dynamic>> getAllFeatureVariables(
     String featureKey,
-    userID,
-    Map<String, dynamic> attributes,
   ) async {
     final featureVariables =
         await _channel.invokeMethod('getAllFeatureVariables', <String, dynamic>{
       'feature_key': featureKey,
-      'user_id': userID,
-      'attributes': attributes,
     });
     return Map<String, dynamic>.from(featureVariables);
   }
 
   //https://docs.developers.optimizely.com/full-stack/docs/run-a-b-tests
+  //TODO: deprecate: use activateGetVariation
   Future<String?> getVariation(
     String featureKey,
     userID,
@@ -70,19 +71,28 @@ class OptimizelyPlugin {
     return variation;
   }
 
-  //https://docs.developers.optimizely.com/full-stack/docs/track-events
-  //https://docs.developers.optimizely.com/full-stack/docs/include-event-tags
-  // eventTags.addAll({"revenue", 4200}); Reserved "revenue" tag
-  Future trackEvent(
-    String featureKey,
-    userID,
-    Map<String, dynamic> attributes,
+  Future<Map<String, dynamic>> getAllEnabledFeatures() async {
+    final enabledFeatures =
+    await _channel.invokeMethod('getAllEnabledFeatures');
+    return Map<String, dynamic>.from(enabledFeatures);
+  }
+
+  Future<String?> activateGetVariation(
+      String experimentKey,
+      ) async {
+    final variation =
+    await _channel.invokeMethod('getAllFeatureVariables', <String, dynamic>{
+      'feature_key': experimentKey,
+    });
+    return variation;
+  }
+
+  Future<void> trackEvent(
+    String eventKey,
     Map<String, dynamic> eventTags,
   ) async {
     await _channel.invokeMethod('trackEvent', <String, dynamic>{
-      'feature_key': featureKey,
-      'user_id': userID,
-      'attributes': attributes,
+      'feature_key': eventKey,
       'event_tags': eventTags,
     });
   }

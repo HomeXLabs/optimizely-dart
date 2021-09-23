@@ -2,9 +2,11 @@ package com.homexlabs.optimizely_dart
 
 import android.app.Activity
 import androidx.annotation.NonNull
+import com.optimizely.ab.OptimizelyUserContext
 import com.optimizely.ab.android.sdk.OptimizelyClient
 import com.optimizely.ab.android.sdk.OptimizelyManager
 import com.optimizely.ab.config.Variation
+import com.optimizely.ab.optimizelydecision.OptimizelyDecideOption
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -13,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.util.concurrent.TimeUnit
 
 
 /** OptimizelyPlugin */
@@ -25,6 +28,7 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var activity: Activity
 
   private lateinit var optimizelyClient: OptimizelyClient
+  private lateinit var user: OptimizelyUserContext
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "optimizely_plugin")
@@ -61,18 +65,29 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         initOptimizelyManagerAsync(sdkKey!!)
         result.success("")
       }
+      "setUser" -> {
+        val userId = call.argument<String>("user_id")
+        val attributes = call.argument<MutableMap<String, Any>>("attributes")
+        setUser(userId!!, attributes!!)
+      }
       "isFeatureEnabled" -> {
         val featureKey = call.argument<String>("feature_key")
-        val userId = call.argument<String>("user_id")
-        val flag = isFeatureEnabled(featureKey!!, userId!!)
+        val flag = isFeatureEnabled(featureKey!!)
         result.success(flag)
       }
       "getAllFeatureVariables" -> {
         val featureKey = call.argument<String>("feature_key")
-        val userId = call.argument<String>("user_id")
-        val attributes = call.argument<MutableMap<String, Any>>("attributes")
-        val variables = getAllFeatureVariables(featureKey!!, userId!!, attributes!!)
+        val variables = getAllFeatureVariables(featureKey!!)
         result.success(variables)
+      }
+      "getAllEnabledFeatures" -> {
+        val features = getAllEnabledFeatures()
+        result.success(features)
+      }
+      "activateGetVariation" -> {
+        val featureKey = call.argument<String>("feature_key")
+        val variation = activateGetVariation(featureKey!!)
+        result.success(variation)
       }
       "getvariation" -> {
         val featureKey = call.argument<String>("feature_key")
@@ -83,10 +98,8 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
       "trackEvent" -> {
         val featureKey = call.argument<String>("feature_key")
-        val userId = call.argument<String>("user_id")
-        val attributes = call.argument<MutableMap<String, Any>>("attributes")
         val eventTags = call.argument<MutableMap<String, Any>>("event_tags")
-        trackEvent(featureKey!!, userId!!, attributes!!, eventTags!!)
+        trackEvent(featureKey!!, eventTags!!)
         result.success("")
       }
       else -> result.notImplemented()
@@ -114,26 +127,20 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun initOptimizelyManager(sdkKey: String, dataFile: String) {
-    val builder = OptimizelyManager.builder()
-    // In Android, the minimum polling interval is 60 seconds. In iOS, the minimum polling
-    // interval is 2 minutes while the app is open. If you specify shorter polling intervals
-    // than these minimums, the SDK will automatically reset the intervals to 60 seconds (Android)
-    // or 2 minutes (iOS).
-    val optimizelyManager = builder.withDatafileDownloadInterval(60)
+    val optimizelyManager = OptimizelyManager.builder()
             .withSDKKey(sdkKey)
+            .withDatafileDownloadInterval(15, TimeUnit.MINUTES)
+            .withEventDispatchInterval(30, TimeUnit.SECONDS)
             .build(activity.applicationContext)
 
     optimizelyClient = optimizelyManager.initialize(activity.applicationContext, dataFile, true, true)
   }
 
   private fun initOptimizelyManagerAsync(sdkKey: String) {
-    val builder = OptimizelyManager.builder()
-    // In Android, the minimum polling interval is 60 seconds. In iOS, the minimum polling
-    // interval is 2 minutes while the app is open. If you specify shorter polling intervals
-    // than these minimums, the SDK will automatically reset the intervals to 60 seconds (Android)
-    // or 2 minutes (iOS).
-    val optimizelyManager = builder.withDatafileDownloadInterval(60)
+    val optimizelyManager = OptimizelyManager.builder()
             .withSDKKey(sdkKey)
+            .withDatafileDownloadInterval(15, TimeUnit.MINUTES)
+            .withEventDispatchInterval(30, TimeUnit.SECONDS)
             .build(activity.applicationContext)
 
     optimizelyManager.initialize(activity.applicationContext, null) {
@@ -141,20 +148,39 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
   }
 
-  private fun isFeatureEnabled(featureKey: String, userId: String): Boolean{
-    return optimizelyClient.isFeatureEnabled(featureKey, userId)
+  private fun setUser(userId: String, attributes: MutableMap<String, Any>){
+    val userTemp = optimizelyClient.createUserContext(userId, attributes)
+    if(userTemp != null){
+      user = userTemp
+    }
   }
 
-  private fun getAllFeatureVariables(featureKey: String, userId: String, attributes: MutableMap<String, Any>): Map<String, Any>? {
-    val json = optimizelyClient.getAllFeatureVariables(featureKey, userId, attributes)
-    return json?.toMap()
+  private fun isFeatureEnabled(featureKey: String): Boolean{
+    val decision = user.decide(featureKey)
+    return decision.enabled
+  }
+
+  private fun getAllFeatureVariables(featureKey: String): Map<String, Any>? {
+    val decision = user.decide(featureKey)
+    return decision.variables.toMap()
+  }
+
+  private fun getAllEnabledFeatures(): MutableSet<String> {
+    val options: List<OptimizelyDecideOption> = listOf(OptimizelyDecideOption.ENABLED_FLAGS_ONLY)
+    val decisions = user.decideAll(options)
+    return decisions.keys
   }
 
   private fun getVariation(featureKey: String, userId: String, attributes: MutableMap<String, Any>): Variation? {
     return optimizelyClient.getVariation(featureKey, userId, attributes)
   }
 
-  private fun trackEvent(eventKey: String, userId: String, attributes: MutableMap<String, Any>, eventTags: MutableMap<String, Any>) {
-    optimizelyClient.track(eventKey, userId, attributes, eventTags)
+  private fun activateGetVariation(featureKey: String): String? {
+    val decision = user.decide(featureKey)
+    return decision.variationKey
+  }
+
+  private fun trackEvent(eventKey: String, eventTags: MutableMap<String, Any>) {
+    user.trackEvent(eventKey, eventTags)
   }
 }
