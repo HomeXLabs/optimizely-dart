@@ -89,12 +89,12 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         val variation = activateGetVariation(featureKey!!)
         result.success(variation)
       }
-      "getvariation" -> {
+      "getVariation"-> {
         val featureKey = call.argument<String>("feature_key")
         val userId = call.argument<String>("user_id")
         val attributes = call.argument<MutableMap<String, Any>>("attributes")
         val variation = getVariation(featureKey!!, userId!!, attributes!!)
-        result.success(variation)
+        result.success(variation?.key)
       }
       "trackEvent" -> {
         val featureKey = call.argument<String>("feature_key")

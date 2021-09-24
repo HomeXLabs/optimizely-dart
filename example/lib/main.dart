@@ -50,8 +50,6 @@ class _MyAppState extends State<MyApp> {
     try {
       bool? featureEnabled = await optimizelyPlugin.isFeatureEnabled(
         'price_filter',
-        'user@example.org',
-        {'platform': platform},
       );
       priceFilterFlag = 'price_filter feature is $featureEnabled.';
     } on PlatformException catch (e) {
@@ -76,8 +74,6 @@ class _MyAppState extends State<MyApp> {
     try {
       variables = await optimizelyPlugin.getAllFeatureVariables(
         'price_filter',
-        'user@example.org',
-        {'platform': platform},
       );
       int? minPrice = variables['min_price'];
       minPriceVariable = "min_price variable is: ${minPrice.toString()}.";

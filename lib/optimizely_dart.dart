@@ -79,7 +79,7 @@ class OptimizelyPlugin {
     String experimentKey,
   ) async {
     final variation =
-        await _channel.invokeMethod('getAllFeatureVariables', <String, dynamic>{
+        await _channel.invokeMethod('activateGetVariation', <String, dynamic>{
       'feature_key': experimentKey,
     });
     return variation;
