@@ -8,24 +8,23 @@ Currently [Optimizely](https://www.optimizely.com/) does not offer a dedicated f
 
 ## Usage
 
+**You need to init and set up user before using an functions**
+
 functions supported:
 [`isFeatureEnabled`](https://docs.developers.optimizely.com/full-stack/docs/is-feature-enabled-android) 
 [`getAllFeatureVariables`](https://docs.developers.optimizely.com/full-stack/docs/get-all-feature-variables-android).
+[`getAllEnabledFeatures`](https://docs.developers.optimizely.com/full-stack/docs/get-all-feature-variables-android).
+[`activategetVariable`](https://docs.developers.optimizely.com/full-stack/docs/get-all-feature-variables-android).
 [`getVariable`](https://docs.developers.optimizely.com/full-stack/docs/get-all-feature-variables-android).
 [`trackEvent`](https://docs.developers.optimizely.com/full-stack/docs/get-all-feature-variables-android).
  
 ```dart
 import 'package:optimizely_dart/optimizely_dart.dart';
-...
 await OptimizelyPlugin.initOptimizelyManager('your_optimizely_sdk_key');
-bool featureEnabled = await OptimizelyPlugin.isFeatureEnabled('your_flag', 'some_user@xyz.com');
 ...
-Map<String, dynamic> variables = await OptimizelyPlugin.getAllFeatureVariables(
-  'your_flag_with_vars',
-  'some_user@xyz.com',
-  {'attribute_key': attribute_value},
-);
-String variable_value = variables['variable_name'];
+  unawaited(OptimizelyPlugin().setUser(_personManager.person?.id, {'isLoggedIn':true}));
+...
+bool featureEnabled = await OptimizelyPlugin.isFeatureEnabled('your_flag', 'some_user@xyz.com');
 
  var variation = await OptimizelyPlugin().getVariation('your_flag', 'some_user@xyz.com',{});
 
