@@ -1,6 +1,6 @@
 # optimizely_dart
 
-Flutter/Dart plugin for Optimizely native SDKs
+Flutter/Dart plugin for Optimizely native SDKs,
 
 ## Getting Started
 
@@ -8,7 +8,7 @@ Currently [Optimizely](https://www.optimizely.com/) does not offer a dedicated f
 
 ## Usage
 
-**You need to init and set up user before using an functions**
+**You need to init and set up user before using any functions**
 
 functions supported:
 [`isFeatureEnabled`](https://docs.developers.optimizely.com/full-stack/docs/is-feature-enabled-android) 
