@@ -6,7 +6,7 @@ enum InitResult {
   case failure(Error)
 }
 
-public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
+public class OptimizelyPlugin: NSObject, FlutterPlugin {
     
     typealias GetFeatureItems = (featureKey: String, userId: String, attributes: OptimizelyAttributes?, eventTags: OptimizelyEventTags?)
     var client: OptimizelyClient?
@@ -17,7 +17,7 @@ public class SwiftOptimizelyPlugin: NSObject, FlutterPlugin {
             name: "optimizely_plugin",
             binaryMessenger: registrar.messenger()
         )
-        let instance = SwiftOptimizelyPlugin()
+        let instance = OptimizelyPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
     

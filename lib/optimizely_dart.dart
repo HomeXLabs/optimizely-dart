@@ -53,8 +53,6 @@ class OptimizelyPlugin {
     return Map<String, dynamic>.from(featureVariables);
   }
 
-  //https://docs.developers.optimizely.com/full-stack/docs/run-a-b-tests
-  //TODO: deprecate: use activateGetVariation
   Future<String?> getVariation(
     String featureKey,
     userID,
@@ -79,7 +77,7 @@ class OptimizelyPlugin {
     String experimentKey,
   ) async {
     final variation =
-        await _channel.invokeMethod('getAllFeatureVariables', <String, dynamic>{
+        await _channel.invokeMethod('activateGetVariation', <String, dynamic>{
       'feature_key': experimentKey,
     });
     return variation;
