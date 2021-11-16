@@ -111,11 +111,10 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivity() {
-    TODO("Not yet implemented")
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-    TODO("Not yet implemented")
+    onAttachedToActivity(binding)
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -123,7 +122,7 @@ class OptimizelyPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-    TODO("Not yet implemented")
+    onDetachedFromActivity()
   }
 
   private fun initOptimizelyManager(sdkKey: String, dataFile: String) {
