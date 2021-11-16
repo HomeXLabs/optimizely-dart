@@ -1,6 +1,6 @@
 name: optimizely_dart
 description: Flutter plugin for Optimizely native SDKs. Check feature flags and feature variables from your Optimizely project.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/HomeXLabs/optimizely-dart
 repository: https://github.com/HomeXLabs/optimizely-dart
 
