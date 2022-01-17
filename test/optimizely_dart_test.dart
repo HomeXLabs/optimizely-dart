@@ -14,24 +14,14 @@ void main() {
           break;
         case 'isFeatureEnabled':
           var featureKey = methodCall.arguments['feature_key'];
-          var userId = methodCall.arguments['user_id'];
-          if (userId == 'user@pg.com' && featureKey == 'flutter') {
+          if (featureKey == 'flutter') {
             return true;
           }
           return false;
         case 'getAllFeatureVariables':
           var featureKey = methodCall.arguments['feature_key'];
-          var userId = methodCall.arguments['user_id'];
-          var attributes = methodCall.arguments['attributes'];
-          if (featureKey == 'calculator' && userId == 'user@pg.com') {
-            switch (attributes['platform']) {
-              case 'ios':
-                return {'calc_type': 'scientific'};
-              case 'android':
-                return {'calc_type': 'basic'};
-              default:
-                return {};
-            }
+          if (featureKey == 'calculator') {
+            return {'calc_type': 'scientific'};
           }
           return {};
         default:
@@ -60,28 +50,14 @@ void main() {
     final optimizelyPlugin = OptimizelyPlugin();
     final enabled = await optimizelyPlugin.isFeatureEnabled(
       'flutter',
-      'user@pg.com',
-      {'platform': 'android'},
     );
     expect(enabled, true);
   });
 
-  test('getAllFeatureVariablesAndroid', () async {
+  test('getAllFeatureVariables', () async {
     final optimizelyPlugin = OptimizelyPlugin();
     var features = await optimizelyPlugin.getAllFeatureVariables(
       'calculator',
-      'user@pg.com',
-      {'platform': 'android'},
-    );
-    expect(features['calc_type'], 'basic');
-  });
-
-  test('getAllFeatureVariablesApple', () async {
-    final optimizelyPlugin = OptimizelyPlugin();
-    var features = await optimizelyPlugin.getAllFeatureVariables(
-      'calculator',
-      'user@pg.com',
-      {'platform': 'ios'},
     );
     expect(features['calc_type'], 'scientific');
   });

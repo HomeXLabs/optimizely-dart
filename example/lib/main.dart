@@ -45,8 +45,6 @@ class _MyAppState extends State<MyApp> {
   Future<void> getPriceFilterFlag() async {
     String priceFilterFlag;
     // Platform messages may fail, so we use a try/catch PlatformException.
-    var platform =
-        Theme.of(context).platform.toString().split('.')[1].toLowerCase();
     try {
       bool? featureEnabled = await optimizelyPlugin.isFeatureEnabled(
         'price_filter',
@@ -69,8 +67,6 @@ class _MyAppState extends State<MyApp> {
   Future<void> getPriceFilterMinPrice() async {
     String minPriceVariable;
     Map<String, dynamic> variables;
-    var platform =
-        Theme.of(context).platform.toString().split('.')[1].toLowerCase();
     try {
       variables = await optimizelyPlugin.getAllFeatureVariables(
         'price_filter',
