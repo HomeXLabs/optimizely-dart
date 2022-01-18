@@ -1,3 +1,10 @@
+# 0.1.7
+
+- **Android:** Migrated from jcenter to mavenCentral
+- **Android:** Updated Kotlin to 1.6.10
+- **Android:** Updated Gradle to 7.0.2
+- **Android:** Updated Gradle Build Tools to 7.0.4
+
 # 0.1.6
 
 Remove TODO for onDetachedFromActivity method
