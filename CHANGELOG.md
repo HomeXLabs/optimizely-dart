@@ -1,3 +1,8 @@
+## 0.1.8
+
+- Support Flutter 2.10.0
+  Now its default Android Target is Android 12 (sdk 31).
+
 # 0.1.7
 
 - **Android:** Migrated from jcenter to mavenCentral
